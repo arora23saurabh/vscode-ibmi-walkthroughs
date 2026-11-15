@@ -1,0 +1,74 @@
+EVFEVENT walkthrough: PUB400 validation
+======================================
+
+Status: PASSED
+Final validation completed: 2026-11-15T06:17:04.621Z (UTC)
+System: PUB400, IBM i 7.5
+Code for IBM i: 3.0.13
+VS Code: 1.146.0
+Compiler listing: IBM ILE RPG, 5770WDS V7R5M0 220415 RN
+Exact compiler PTF inventory: unavailable; the test profile lacks DSPPTF authority.
+
+Source-member example
+--------------------
+Source: SARORA1/QEVFSRC(EVFDEMO), type RPGLE
+Target: SARORA1/EVFDEMO
+Event data: SARORA1/EVFEVENT(EVFDEMO)
+Compile: CRTBNDRPG PGM(SARORA1/EVFDEMO) SRCFILE(SARORA1/QEVFSRC) SRCMBR(EVFDEMO) OPTION(*EVENTF)
+
+The intentional misspelling produced RNF7030, severity 30, at line 6, column 7.
+Clicking that Problems entry selected greting in the source member at line 6,
+columns 7-13 (VS Code exclusive end column 14).
+Recorded editor URI: member:/SARORA1/QEVFSRC/EVFDEMO.RPGLE
+Recorded source line: dsply greting;
+
+After changing greting to greeting, the saved source compiled successfully.
+RNS9304 reported the program placed in SARORA1 with highest severity 00.
+Existing compiler diagnostics changed from 4 to 0 through the Action's refresh.
+
+Remote IFS example
+------------------
+Source: /home/SARORA/evfevent-walkthrough-20261115/evfifs.rpgle
+Target: SARORA1/EVFIFS
+Event data: SARORA1/EVFEVENT(EVFIFS)
+Compile: CRTBNDRPG PGM(SARORA1/EVFIFS) SRCSTMF('/home/SARORA/evfevent-walkthrough-20261115/evfifs.rpgle') OPTION(*EVENTF) TGTCCSID(*JOB)
+
+The intentional misspelling produced RNF7030, severity 30, at line 6, column 7.
+Clicking that Problems entry selected greting in the remote IFS source at line 6,
+columns 7-13 (exclusive end column 14).
+Recorded editor URI: streamfile:/home/SARORA/evfevent-walkthrough-20261115/evfifs.rpgle
+Recorded source line: dsply greting;
+
+The corrected, saved source compiled successfully with highest severity 00.
+Existing compiler diagnostics changed from 4 to 0 through the Action's refresh.
+The event member remained in the target library despite the IFS source path.
+
+Missing-*EVENTF control
+----------------------
+The intentionally broken member compiled with OPTION(*NOEVENTF) failed.
+After explicitly clearing diagnostics to establish the control's empty baseline,
+the Problems view remained empty and the Action output reported:
+*EVENTF not found in command string. Not fetching errors for SARORA1/EVFDEMO.
+
+The member was corrected again and compiled successfully with OPTION(*EVENTF).
+Both final program objects exist in SARORA1, with no remaining diagnostics for
+either example.
+
+Method and scope
+----------------
+A local validation helper used the installed Code for IBM i extension's public
+Action command and captured Action output, event data and VS Code diagnostics.
+The Problems entries were clicked through the Windows UI, followed by editor
+URI/selection snapshots. Correction checks retained the existing diagnostics
+before invoking the Action; the extension performed their refresh.
+
+The two navigation screenshots accompany this record. Complete raw logs and
+diagnostic snapshots are retained locally by the contributor.
+
+Only direct CRTBNDRPG member and remote-IFS Actions in the system ASP were
+tested. Local deployment, IASP, wrappers, TOBi, non-default Problems filters,
+and ignored-message settings were not exercised.
+
+An additional CPF2407 QRPGLEMSG message appeared in failed-compile job output.
+The compiler listing, event data, diagnostic navigation, and corrected compiles
+all worked.
